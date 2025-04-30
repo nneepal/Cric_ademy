@@ -1,0 +1,133 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Card Section */
+.card-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 50px 80px; /* Increased side padding for stretch effect */
+    gap: 30px;
+}
+
+.card-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    padding: 50px 30px;
+    background-color: #2d3436; /* Matching the navbar color */
+    border-radius: 24px;
+    margin: 50px auto;
+    max-width: 1300px; /* Slightly wider to accommodate content */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 18px;
+    padding: 25px 20px;
+    width: 260px; /* Slightly wider to adapt text */
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card img {
+    width: 250px;
+    height: 250px;
+    margin-bottom: 16px;
+}
+
+.card h3 {
+    font-size: 20px;
+    color: #556b2f; /* Harmonious olive/navy tone */
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.card p {
+    font-size: 15px;
+    color: #444;
+    text-align: justify; /* Text aligned both sides */
+    line-height: 1.6;
+    margin-top: 10px;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Welcome Section */
+.welcome-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 60px;
+    background-color: #ffffff;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.welcome-text {
+    flex: 1;
+    max-width: 600px;
+    padding-right: 40px;
+}
+
+.welcome-text h2 {
+    font-size: 28px;
+    color: #1c1c1c;
+    margin-bottom: 20px;
+}
+
+.welcome-text p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.welcome-text button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.welcome-img {
+    width: 400px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.learn-more-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #1e88e5;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(30, 136, 229, 0.3);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.learn-more-btn:hover {
+    background-color: #1565c0;
+    transform: translateY(-2px);
+}
+
