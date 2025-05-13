@@ -101,113 +101,103 @@ body {
 .main-content h2 {
     color: #1a3a6e;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #f8c537;
-    padding-bottom: 0.5rem;
 }
 
-.card-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+/* Tab Content */
+.tab-content {
+    display: none;
+    margin-top: 2rem;
 }
 
-.card {
-    background-color: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
+.tab-link {
+    color: #2c4b7a;
+    padding: 1rem;
+    cursor: pointer;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card h3 {
-    color: #1a3a6e;
-    margin-top: 0;
-}
-
-.card p {
-    color: #666;
-    margin-bottom: 1.5rem;
-}
-
-/* Button Styles */
-.btn-view {
-    background-color: #1a3a6e;
+.tab-link.active {
+    background-color: #f8c537;
     color: white;
+}
+
+.message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.message.error {
+    background-color: #ffcccc;
+    color: #d60000;
+}
+
+.message.success {
+    background-color: #e8ffcc;
+    color: #1c6b2d;
+}
+
+/* Player Table */
+.player-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.player-table th, .player-table td {
+    padding: 0.8rem;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.player-table th {
+    background-color: #f8c537;
+    color: #1a3a6e;
+}
+
+.player-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.player-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Action Buttons */
+.btn-primary, .btn-danger {
+    padding: 0.5rem 1rem;
     border: none;
-    padding: 0.6rem 1rem;
+    color: white;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.btn-view:hover {
-    background-color: #12305a;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
 }
 
 .btn-primary {
-    background-color: #f8c537;
-    color: #1a3a6e;
+    background-color: #1a3a6e;
+}
+
+.btn-danger {
+    background-color: #d60000;
+}
+
+.btn-primary:hover, .btn-danger:hover {
+    opacity: 0.8;
+}
+
+/* Form Inputs */
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], button[type="submit"] {
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button[type="submit"] {
+    background-color: #1a3a6e;
+    color: white;
     border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 4px;
-    font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s;
 }
 
-.btn-primary:hover {
-    background-color: #e6b42e;
-}
-
-.btn-secondary {
-    background-color: white;
-    color: #1a3a6e;
-    border: 1px solid #1a3a6e;
-    padding: 0.8rem 1.5rem;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-secondary:hover {
-    background-color: #1a3a6e;
-    color: white;
-}
-
-/* Footer Styles */
-.admin-footer {
-    background-color: #1a3a6e;
-    color: white;
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.footer-links a {
-    color: white;
-    margin-left: 1rem;
-    text-decoration: none;
-}
-
-.footer-links a:hover {
-    color: #f8c537;
+button[type="submit"]:hover {
+    opacity: 0.8;
 }

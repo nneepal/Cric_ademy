@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 public class LoginService {
 
     // Validate username and password, and return role if valid
-    public String authenticateUser(String username, String password) {
+    public String authenticate(String username, String password) {
         String role = null;
         String sql = "SELECT password, role FROM Users WHERE username = ?";
 

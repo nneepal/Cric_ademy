@@ -1,80 +1,80 @@
 package com.cricademy.filter;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import com.cricademy.util.CookieUtil;
+import com.cricademy.util.SessionUtil;
+import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-
-import com.cricademy.util.CookieUtil;
-import com.cricademy.util.SessionUtil;
 
 @WebFilter(asyncSupported = true, urlPatterns = "/*")
 public class AuthenticationFilter implements Filter {
 
-    private static final String LOGIN = "/login";
-    private static final String REGISTER = "/register";
-    private static final String HOME = "/home";
-    private static final String ABOUT = "/about";
-    private static final String CONTACT = "/contact";
-    private static final String ADMIN = "/admin";
-    private static final String ROOT = "/";
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // Optional init logic
-    }
+    private static final String[] PUBLIC_PATHS = {
+        "/", "/home", "/about", "/login", "/register", "/contact"
+    };
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
-        
+            throws IOException, ServletException {
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         String uri = req.getRequestURI();
+        
+        // Check session for username and role
+        String username = (String) SessionUtil.getAttribute(req, "username");
+        String role = (String) SessionUtil.getAttribute(req, "role");
+        
+        // Fallback to cookie if role not found in session
+        if (role == null && CookieUtil.getCookie(req, "role") != null) {
+            role = CookieUtil.getCookie(req, "role").getValue();
+        }
 
-        // Allow static resources
-        if (uri.endsWith(".css") || uri.endsWith(".js") || uri.endsWith(".png") || uri.endsWith(".jpg")) {
+        // Allow static resources (CSS, JS, images, fonts, etc.)
+        if (uri.matches(".*(\\.css|\\.js|\\.png|\\.jpg|\\.jpeg|\\.gif|\\.svg|\\.woff|\\.woff2|\\.ttf|\\.eot)$")) {
             chain.doFilter(request, response);
             return;
         }
 
-        boolean isLoggedIn = SessionUtil.getAttribute(req, "username") != null;
-        String role = CookieUtil.getCookie(req, "role") != null ? CookieUtil.getCookie(req, "role").getValue() : null;
+        // Allow public paths to everyone
+        for (String path : PUBLIC_PATHS) {
+            if (uri.equals(req.getContextPath() + path) || uri.equals(path)) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
 
-        boolean isPublicPath = uri.endsWith(LOGIN) || uri.endsWith(REGISTER) || 
-                               uri.endsWith(HOME) || uri.endsWith(ABOUT) || uri.endsWith(ROOT);
-
-        if (isPublicPath) {
-            chain.doFilter(request, response);
+        // Admin-only path
+        if (uri.equals(req.getContextPath() + "/admin")) {
+            System.out.println("Filter: username: " + username);
+            System.out.println("Filter: role: " + role);
+            if (username != null && "admin".equals(role)) {
+                chain.doFilter(request, response);
+            } else {
+                res.sendRedirect(req.getContextPath() + "/login");
+            }
             return;
         }
 
-        if ("admin".equals(role)) {
-            if (uri.startsWith(req.getContextPath() + ADMIN)) {
+        // Profile page – allow both admin and player
+        if (uri.equals(req.getContextPath() + "/profile")) {
+            if (username != null && ("admin".equals(role) || "player".equals(role))) {
                 chain.doFilter(request, response);
             } else {
-                res.sendRedirect(req.getContextPath() + ADMIN);
+                res.sendRedirect(req.getContextPath() + "/login");
             }
-        } else if ("player".equals(role)) {
-            if (uri.endsWith(HOME) || uri.endsWith(ABOUT) || uri.endsWith(CONTACT)) {
-                chain.doFilter(request, response);
-            } else {
-                res.sendRedirect(req.getContextPath() + HOME);
-            }
-        } else {
-            res.sendRedirect(req.getContextPath() + LOGIN);
+            return;
         }
+
+        // Default case – block and redirect to login
+        res.sendRedirect(req.getContextPath() + "/login");
     }
 
     @Override
-    public void destroy() {
-        // Optional cleanup
-    }
+    public void init(FilterConfig filterConfig) {}
+
+    @Override
+    public void destroy() {}
 }

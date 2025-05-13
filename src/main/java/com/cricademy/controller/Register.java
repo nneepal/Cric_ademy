@@ -26,7 +26,7 @@ public class Register extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final RegisterService registerService = new RegisterService();
-    private final ImageUtil imageUtil = new ImageUtil(); // Create instance of ImageUtil
+    private final ImageUtil imageUtil = new ImageUtil();
 
     public Register() {
         super();
@@ -101,14 +101,17 @@ public class Register extends HttpServlet {
             request.setAttribute("imageError", "Profile image is required.");
             isValid = false;
         } else {
-            String originalFileName = imageUtil.getFileName(profileImage);  // Using imageUtil instance
-            if (!imageUtil.isAllowedImageType(originalFileName)) {  // Using imageUtil instance
+            String originalFileName = imageUtil.getImageNameFromPart(profileImage);  // Changed to getImageNameFromPart
+            if (!isImageTypeAllowed(originalFileName)) {  // Using local method for type checking
                 request.setAttribute("imageError", "Only JPG, JPEG, or PNG files are allowed.");
                 isValid = false;
             } else {
-                savedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
-                String uploadPath = getServletContext().getRealPath("/") + "uploads/profile_images";
-                boolean uploadSuccess = imageUtil.uploadImage(profileImage, uploadPath, savedFileName); // Using imageUtil instance
+                // Generate unique filename
+                savedFileName =originalFileName;
+                // Get root path and save folder
+                String rootPath = getServletContext().getRealPath("/");
+                String saveFolder = "profile_images"; // or whatever folder name you want to use
+                boolean uploadSuccess = imageUtil.uploadImage(profileImage, rootPath, saveFolder);
                 if (!uploadSuccess) {
                     request.setAttribute("imageError", "Failed to upload the image. Try again.");
                     isValid = false;
@@ -135,7 +138,7 @@ public class Register extends HttpServlet {
 
         // Create PlayerModel with encrypted password
         String role = "player";
-        String profileImagePath = "/uploads/profile_images/" + savedFileName;
+        String profileImagePath = "/resources/images/system/profile_images/" + savedFileName; // Updated path to match ImageUtil
         PlayerModel player = new PlayerModel(username, email, encryptedPassword, phone, role, profileImagePath);
 
         boolean registrationResult = registerService.addUser(player);
@@ -149,5 +152,16 @@ public class Register extends HttpServlet {
             request.setAttribute("phone", phone);
             request.getRequestDispatcher("/WEB-INF/pages/register.jsp").forward(request, response);
         }
+    }
+
+    /**
+     * Helper method to check if the image type is allowed
+     */
+    private boolean isImageTypeAllowed(String fileName) {
+        if (fileName == null) return false;
+        String lowerCaseFileName = fileName.toLowerCase();
+        return lowerCaseFileName.endsWith(".jpg") || 
+               lowerCaseFileName.endsWith(".jpeg") || 
+               lowerCaseFileName.endsWith(".png");
     }
 }

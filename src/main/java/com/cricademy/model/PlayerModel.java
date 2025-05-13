@@ -7,6 +7,8 @@ public class PlayerModel {
     private String phone;
     private String role;
     private String profileImage;
+    
+    public PlayerModel() {}
 
     public PlayerModel(String username, String email, String password, String phone, String role, String profileImage) {
         this.username = username;
@@ -21,7 +23,31 @@ public class PlayerModel {
         return username;
     }
 
-    public String getEmail() {
+    public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}
+
+	public String getEmail() {
         return email;
     }
 
@@ -39,5 +65,15 @@ public class PlayerModel {
 
     public String getProfileImage() {
         return profileImage;
+    }
+    @Override
+    public String toString() {
+        return "PlayerModel{" +
+               "username='" + username + '\'' +
+               ", email='" + email + '\'' +
+               ", phone='" + phone + '\'' +
+               ", role='" + role + '\'' +
+               ", profileImage='" + profileImage + '\'' +
+               '}';
     }
 }

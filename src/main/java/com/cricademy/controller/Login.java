@@ -5,9 +5,7 @@ import com.cricademy.util.CookieUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
@@ -17,38 +15,59 @@ public class Login extends HttpServlet {
 
     private final LoginService loginService = new LoginService();
 
-    public Login() {
-        super();
-    }
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        request.setCharacterEncoding("UTF-8");
 
-        String role = loginService.authenticateUser(username, password);
+        String username = request.getParameter("username");
+        String inputPassword = request.getParameter("password");
+
+        boolean isValid = true;
+
+        // Validate username
+        if (username == null || username.trim().isEmpty()) {
+            request.setAttribute("usernameError", "Username is required.");
+            isValid = false;
+        }
+
+        // Validate password
+        if (inputPassword == null || inputPassword.trim().isEmpty()) {
+            request.setAttribute("passwordError", "Password is required.");
+            isValid = false;
+        }
+
+        // If validation fails, reload form with errors and old data
+        if (!isValid) {
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(request, response);
+            return;
+        }
+
+        // Authenticate
+        String role = loginService.authenticate(username, inputPassword);
 
         if (role != null) {
-            // Successful login: Create cookie based on role
-            CookieUtil.addCookie(response, "role", role, 60 * 60); // Cookie valid for 1 hour
+            // Login successful
+            HttpSession session = request.getSession();
+            session.setAttribute("username", username);
 
-            // Also you may set username in session if needed (optional)
-            request.getSession().setAttribute("username", username);
+            CookieUtil.addCookie(response, "role", role, 60 * 60); // 1 hour validity
 
-            if ("admin".equals(role)) {
+            if ("admin".equalsIgnoreCase(role)) {
                 response.sendRedirect(request.getContextPath() + "/admin");
             } else {
                 response.sendRedirect(request.getContextPath() + "/home");
             }
         } else {
-            // Invalid login: Show error
-            request.setAttribute("loginError", "Invalid username or password.");
-            request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+            // Login failed due to wrong credentials
+            request.setAttribute("error", "Invalid username or password.");
+            request.setAttribute("username", username); // preserve entered username
+            request.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(request, response);
         }
     }
 }
