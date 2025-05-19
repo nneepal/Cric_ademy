@@ -201,3 +201,88 @@ button[type="submit"] {
 button[type="submit"]:hover {
     opacity: 0.8;
 }
+/* Statistics Container */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Individual Stat Card */
+.stat-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+/* Hover Effect */
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border-color: #d0d0d0;
+}
+
+/* Stat Value (Big Number) */
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+/* Stat Label (Description) */
+.stat-label {
+    font-size: 0.95rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+/* Optional: Color Variations for Different Cards */
+.stat-card:nth-child(1) {
+    border-top: 4px solid #3498db;
+}
+
+.stat-card:nth-child(2) {
+    border-top: 4px solid #2ecc71;
+}
+
+.stat-card:nth-child(3) {
+    border-top: 4px solid #e74c3c;
+}
+
+.stat-card:nth-child(4) {
+    border-top: 4px solid #f39c12;
+}
+
+.stat-card:nth-child(5) {
+    border-top: 4px solid #9b59b6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .stats-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+}

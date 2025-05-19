@@ -14,13 +14,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
-import java.util.UUID;
 
+/**
+ * Servlet implementation class Register
+ * Handles user registration including form validation, password encryption,
+ * profile image upload, and user creation.
+ * Supports multipart file upload with max 5MB file size.
+ * 
+ * Author: Arpan Nepal
+ * LMUID: 23048647
+ */
 @WebServlet("/register")
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024, // 1MB
-    maxFileSize = 5 * 1024 * 1024,    // 5MB
-    maxRequestSize = 10 * 1024 * 1024 // 10MB
+    fileSizeThreshold = 1024 * 1024, // 1MB threshold before writing to disk
+    maxFileSize = 5 * 1024 * 1024,    // Max file size 5MB
+    maxRequestSize = 10 * 1024 * 1024 // Max request size 10MB
 )
 public class Register extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -32,15 +40,25 @@ public class Register extends HttpServlet {
         super();
     }
 
+    /**
+     * Handles GET requests, forwards to registration JSP form.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/WEB-INF/pages/register.jsp").forward(request, response);
     }
 
+    /**
+     * Handles POST requests for form submission.
+     * Validates input fields, uploads profile image, encrypts password,
+     * and registers new user.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Set request encoding to UTF-8 for handling special characters
         request.setCharacterEncoding("UTF-8");
 
+        // Retrieve form parameters
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -48,10 +66,10 @@ public class Register extends HttpServlet {
         String phone = request.getParameter("phone");
         Part profileImage = request.getPart("profileImage");
 
-        boolean isValid = true;
-        String savedFileName = null;
+        boolean isValid = true; // Flag for overall validation status
+        String savedFileName = null; // Will store uploaded image filename
 
-        // Username validation
+        // Username validation: required, start with letter, length 3-20, alphanumeric and underscores allowed
         if (username == null || username.trim().isEmpty()) {
             request.setAttribute("usernameError", "Username is required.");
             isValid = false;
@@ -60,7 +78,7 @@ public class Register extends HttpServlet {
             isValid = false;
         }
 
-        // Email validation
+        // Email validation: required and regex format check
         if (email == null || email.trim().isEmpty()) {
             request.setAttribute("emailError", "Email is required.");
             isValid = false;
@@ -69,7 +87,7 @@ public class Register extends HttpServlet {
             isValid = false;
         }
 
-        // Password validation
+        // Password validation: required and minimum length 6
         if (password == null || password.trim().isEmpty()) {
             request.setAttribute("passwordError", "Password is required.");
             isValid = false;
@@ -78,7 +96,7 @@ public class Register extends HttpServlet {
             isValid = false;
         }
 
-        // Confirm Password validation
+        // Confirm password validation: required and must match password
         if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
             request.setAttribute("confirmPasswordError", "Confirm password is required.");
             isValid = false;
@@ -87,7 +105,7 @@ public class Register extends HttpServlet {
             isValid = false;
         }
 
-        // Phone validation
+        // Phone validation: required and must start with '98' and be 10 digits total
         if (phone == null || phone.trim().isEmpty()) {
             request.setAttribute("phoneError", "Phone number is required.");
             isValid = false;
@@ -96,21 +114,21 @@ public class Register extends HttpServlet {
             isValid = false;
         }
 
-        // Image validation
+        // Profile image validation: required and allowed file types only
         if (profileImage == null || profileImage.getSize() == 0) {
             request.setAttribute("imageError", "Profile image is required.");
             isValid = false;
         } else {
-            String originalFileName = imageUtil.getImageNameFromPart(profileImage);  // Changed to getImageNameFromPart
-            if (!isImageTypeAllowed(originalFileName)) {  // Using local method for type checking
+            String originalFileName = imageUtil.getImageNameFromPart(profileImage);
+            if (!isImageTypeAllowed(originalFileName)) {
                 request.setAttribute("imageError", "Only JPG, JPEG, or PNG files are allowed.");
                 isValid = false;
             } else {
-                // Generate unique filename
-                savedFileName =originalFileName;
-                // Get root path and save folder
+                // Save the image on the server
+                savedFileName = originalFileName;
                 String rootPath = getServletContext().getRealPath("/");
-                String saveFolder = "profile_images"; // or whatever folder name you want to use
+                String saveFolder = "profile_images"; // Folder to save profile images
+
                 boolean uploadSuccess = imageUtil.uploadImage(profileImage, rootPath, saveFolder);
                 if (!uploadSuccess) {
                     request.setAttribute("imageError", "Failed to upload the image. Try again.");
@@ -119,7 +137,7 @@ public class Register extends HttpServlet {
             }
         }
 
-        // If validation fails, reload form with old data
+        // If any validation failed, reload form with old data and error messages
         if (!isValid) {
             request.setAttribute("username", username);
             request.setAttribute("email", email);
@@ -128,7 +146,7 @@ public class Register extends HttpServlet {
             return;
         }
 
-        // Encrypt password before saving
+        // Encrypt password using PasswordUtil (username used as key)
         String encryptedPassword = PasswordUtil.encrypt(username, password);
         if (encryptedPassword == null) {
             request.setAttribute("error", "Failed to encrypt password. Try again.");
@@ -136,13 +154,15 @@ public class Register extends HttpServlet {
             return;
         }
 
-        // Create PlayerModel with encrypted password
-        String role = "player";
-        String profileImagePath = "/resources/images/system/profile_images/" + savedFileName; // Updated path to match ImageUtil
+        // Create player model with all user details
+        String role = "player"; // Default role for new users
+        String profileImagePath = "/resources/images/system/profile_images/" + savedFileName; // Stored profile image path
         PlayerModel player = new PlayerModel(username, email, encryptedPassword, phone, role, profileImagePath);
 
+        // Add user via register service
         boolean registrationResult = registerService.addUser(player);
 
+        // Redirect to login if success, else reload form with error
         if (registrationResult) {
             response.sendRedirect(request.getContextPath() + "/login");
         } else {
@@ -155,7 +175,11 @@ public class Register extends HttpServlet {
     }
 
     /**
-     * Helper method to check if the image type is allowed
+     * Helper method to check if the image file type is allowed.
+     * Only jpg, jpeg, and png extensions are accepted.
+     * 
+     * @param fileName the name of the file
+     * @return true if allowed, false otherwise
      */
     private boolean isImageTypeAllowed(String fileName) {
         if (fileName == null) return false;

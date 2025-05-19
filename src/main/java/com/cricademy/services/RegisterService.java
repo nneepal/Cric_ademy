@@ -6,9 +6,21 @@ import com.cricademy.model.PlayerModel;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+/**
+ * RegisterService handles the registration of new users (players) into the system.
+ * It inserts user details into the Users database table.
+ * 
+ * Author: Arpan Nepal
+ * LMUID: 23048647
+ */
 public class RegisterService {
 
-    // Method to register the player
+    /**
+     * Registers a new user in the database.
+     * 
+     * @param player PlayerModel object containing user details
+     * @return true if the user was successfully inserted, false otherwise
+     */
     public boolean addUser(PlayerModel player) {
         boolean isInserted = false;
 
@@ -30,7 +42,7 @@ public class RegisterService {
             System.out.println("Rows inserted: " + rows);
 
         } catch (Exception e) {
-            e.printStackTrace(); // Log the error for debugging
+            e.printStackTrace(); // Consider proper logging in production
         }
 
         return isInserted;

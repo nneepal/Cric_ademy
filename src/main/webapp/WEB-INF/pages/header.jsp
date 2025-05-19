@@ -14,6 +14,7 @@
             <a href="${pageContext.request.contextPath}/home" class="active">Home</a>
             <a href="${pageContext.request.contextPath}/about" class="active">About</a>
             <a href="${pageContext.request.contextPath}/contact" class="active">Contact</a>
+            <a href="${pageContext.request.contextPath}/players" class="active">Players</a>
             <a href="${pageContext.request.contextPath}/profile" class="active">Profile</a>
         </div>
 

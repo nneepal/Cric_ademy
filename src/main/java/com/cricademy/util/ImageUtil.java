@@ -6,56 +6,53 @@ import jakarta.servlet.http.Part;
 
 /**
  * Utility class for handling image file uploads.
- * This class provides methods for extracting the file name from a Part
- * object and uploading the image file to a specified directory on the server.
+ * Provides methods to extract the filename from a Part object
+ * and to upload image files to a specified directory on the server.
+ * 
+ * Author: Arpan Nepal
+ * LMUID: 23048647
  */
 public class ImageUtil {
 
     /**
-     * Extracts the file name from the given Part object based on the
+     * Extracts the filename from the given Part object based on the
      * "content-disposition" header.
-     *
+     * 
+     * This method handles different browser behaviors including IE
+     * which may include full path in the filename.
+     * 
      * @param part the Part object representing the uploaded file.
-     * @return the extracted file name. If no filename is found, returns a default
-     *         name "download.png".
+     * @return the extracted filename; returns "download.png" if none found.
      */
     public String getImageNameFromPart(Part part) {
-        // Retrieve the content-disposition header from the part
         String contentDisp = part.getHeader("content-disposition");
-        
-
-        // Split the header by semicolons to isolate key-value pairs
         String[] items = contentDisp.split(";");
-
-        // Initialize imageName variable to store the extracted file name
         String imageName = null;
 
-        // Iterate through the items to find the filename
         for (String s : items) {
             if (s.trim().startsWith("filename")) {
-                // Extract the file name from the header value
-                imageName = s.substring(s.indexOf("=") + 2, s.length() - 1);
+                imageName = s.substring(s.indexOf('=') + 1).trim().replace("\"", "");
+                // Strip path if any (handles IE full path filename)
+                imageName = imageName.substring(imageName.lastIndexOf(File.separator) + 1);
             }
         }
 
-        // Check if the filename was not found or is empty
         if (imageName == null || imageName.isEmpty()) {
-            // Assign a default file name if none was provided
             imageName = "download.png";
         }
 
-        // Return the extracted or default file name
         return imageName;
     }
 
     /**
-     * Uploads the image file from the given Part object to a specified
-     * directory on the server.
-     *
-     * @param part the Part object representing the uploaded image file.
-     * @param rootPath the root path of the project (usually comes from the servlet context).
-     * @param saveFolder the folder within the rootPath where the image will be saved.
-     * @return true if the file was successfully uploaded, false otherwise.
+     * Uploads the image file from the Part object to a directory on the server.
+     * The directory path is constructed from rootPath and saveFolder.
+     * If the directory doesn't exist, it attempts to create it.
+     * 
+     * @param part the Part object containing the uploaded image file.
+     * @param rootPath the root directory path of the web application.
+     * @param saveFolder the folder name inside the root path to save the image.
+     * @return true if the upload succeeds, false otherwise.
      */
     public boolean uploadImage(Part part, String rootPath, String saveFolder) {
         String savePath = getSavePath(rootPath, saveFolder);
@@ -64,33 +61,33 @@ public class ImageUtil {
         // Ensure the directory exists
         if (!fileSaveDir.exists()) {
             if (!fileSaveDir.mkdirs()) {
-                return false; // Failed to create the directory
+                return false; // Failed to create directory
             }
         }
 
         try {
-            // Get the image name
+            // Extract the image filename
             String imageName = getImageNameFromPart(part);
-            // Create the file path
+            // Construct the full file path
             String filePath = savePath + imageName;
-            // Write the file to the server
+            // Save the file to disk
             part.write(filePath);
-            return true; // Upload successful
+            return true; // Upload succeeded
         } catch (IOException e) {
-            e.printStackTrace(); // Log the exception
+            e.printStackTrace(); // Log exception details
             return false; // Upload failed
         }
     }
 
     /**
-     * Returns the path to save the image based on the provided folder name.
-     *
-     * @param rootPath the root path of the application.
-     * @param saveFolder the folder where images will be saved (e.g., "customer").
-     * @return the full save path.
+     * Constructs the full directory path where images should be saved.
+     * 
+     * @param rootPath the root path of the application (e.g., servlet context real path).
+     * @param saveFolder the subfolder inside the images directory (e.g., "customer").
+     * @return the full path where the image should be saved.
      */
     public String getSavePath(String rootPath, String saveFolder) {
-        // Construct the save path by combining the root path and the folder
-		return "/Users/arpannepal/eclipse-workspace/Cricademy/src/main/webapp/resources/images/system/"+saveFolder+"/";
+        // Customize this path as per deployment environment
+        return "/Users/arpannepal/eclipse-workspace/Cricademy/src/main/webapp/resources/images/system/" + saveFolder + "/";
     }
 }

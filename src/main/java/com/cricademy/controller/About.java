@@ -9,6 +9,9 @@ import java.io.IOException;
 
 /**
  * Servlet implementation class About
+ * 
+ * @author Arpan Nepal
+ * LMUID: 23048647
  */
 @WebServlet("/about")
 public class About extends HttpServlet {
@@ -19,14 +22,12 @@ public class About extends HttpServlet {
      */
     public About() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		request.getRequestDispatcher("WEB-INF/pages/about.jsp").forward(request, response);
 	}
 
@@ -34,8 +35,6 @@ public class About extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
 }

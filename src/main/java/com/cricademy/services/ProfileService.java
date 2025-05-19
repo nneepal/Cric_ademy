@@ -9,12 +9,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Service class for managing user profile-related operations such as fetching,
- * updating user details, and validating phone and email uniqueness.
+ * ProfileService handles user profile operations including fetching and updating
+ * user details, as well as validating uniqueness of phone and email.
+ * 
+ * Author: Arpan Nepal
+ * LMUID: 23048647
  */
 public class ProfileService {
     private Connection dbConn;
 
+    /**
+     * Default constructor that establishes a database connection.
+     * Logs an error message if the connection cannot be established.
+     */
     public ProfileService() {
         try {
             this.dbConn = DbConfig.getDbConnection();
@@ -24,10 +31,10 @@ public class ProfileService {
     }
 
     /**
-     * Fetches user details by their username.
+     * Retrieves user details by username.
      * 
-     * @param username The username of the user whose details are to be fetched.
-     * @return The PlayerModel object containing user details if found, or null if not.
+     * @param username the username of the user
+     * @return PlayerModel object with user details if found; null otherwise
      */
     public PlayerModel getUserDetails(String username) {
         if (dbConn == null) {
@@ -49,11 +56,46 @@ public class ProfileService {
                 user.setProfileImage(rs.getString("Profile_Image"));
                 return user;
             }
-
         } catch (SQLException e) {
             System.err.println("Error fetching user details: " + e.getMessage());
         }
 
         return null;
+    }
+
+    /**
+     * Updates user profile information.
+     * 
+     * @param oldUsername       current username to identify the user record
+     * @param newUsername       new username to update
+     * @param email             new email
+     * @param encryptedPassword new encrypted password
+     * @param phone             new phone number
+     * @param profileImage      new profile image path
+     * @return true if the update was successful, false otherwise
+     */
+    public boolean updateUserProfile(String oldUsername, String newUsername, String email, String encryptedPassword, String phone, String profileImage) {
+        if (dbConn == null) {
+            System.err.println("DB connection is null in ProfileService.");
+            return false;
+        }
+
+        String updateQuery = "UPDATE Users SET username = ?, email = ?, password = ?, phone = ?, Profile_Image = ? WHERE username = ?";
+
+        try (PreparedStatement stmt = dbConn.prepareStatement(updateQuery)) {
+            stmt.setString(1, newUsername);
+            stmt.setString(2, email);
+            stmt.setString(3, encryptedPassword);
+            stmt.setString(4, phone);
+            stmt.setString(5, profileImage);
+            stmt.setString(6, oldUsername);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating user profile: " + e.getMessage());
+        }
+
+        return false;
     }
 }
